@@ -6,7 +6,7 @@ sdk: docker
 app_port: 7860
 pinned: false
 license: mit
-short_description: OpenEnv environment for evaluating SQL migration safety, rollback readiness, and production deployment risk.
+short_description: OpenEnv environment for evaluating SQL migration safety
 ---
 
 
