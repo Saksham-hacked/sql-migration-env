@@ -1,5 +1,5 @@
-# app.py — required by Hugging Face Spaces as the entrypoint marker.
-# The actual application is defined in main.py; we just re-export `app` here
-# so that both `uvicorn app:app` and `uvicorn main:app` work identically.
+# app.py — root entrypoint required by Hugging Face Spaces.
+# Re-exports `app` from main.py so HF's validator finds it.
+# The Dockerfile still runs: uvicorn main:app --host 0.0.0.0 --port 7860
 
-from main import app  # noqa: F401  re-export for HF Spaces discovery
+from main import app  # noqa: F401
