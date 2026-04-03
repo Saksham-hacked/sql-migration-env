@@ -79,7 +79,7 @@ Each task is graded 0.0–1.0 across three dimensions:
 
 ```bash
 pip install -r requirements.txt
-uvicorn main:app --host 0.0.0.0 --port 7860
+uvicorn server.app:app --host 0.0.0.0 --port 7860
 ```
 
 ## Docker
