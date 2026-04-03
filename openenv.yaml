@@ -9,6 +9,10 @@ tags:
   - real-world
 entrypoint: main:app
 port: 7860
+reset_url: /reset
+step_url: /step
+state_url: /state
+health_url: /health
 tasks:
   - id: task_easy
     description: "DROP COLUMN without rollback on 1,200-row non-production table"

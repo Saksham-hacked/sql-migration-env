@@ -27,6 +27,9 @@ env/
 *.log
 inference.log
 
+# Lock files
+uv.lock
+
 # IDE
 .vscode/
 .idea/
