@@ -1,7 +1,20 @@
+
+
+---
+title: SQL Migration Env
+emoji: robot
+colorFrom: blue
+colorTo: green
+sdk: docker
+app_port: 7860
+pinned: false
+license: mit
+short_description: OpenEnv environment for SQL migration safety review and deployment readiness
+---
+
 # SQL Migration Review Environment
 
 An OpenEnv environment where an AI agent acts as a database migration triage engineer. Given a SQL migration script and context signals, the agent must classify severity, recommend action, and select the appropriate safety checks.
-
 ## Motivation
 
 Every engineering team shipping database migrations faces the same risk: a bad `ALTER TABLE` or `CREATE INDEX` on a large production table can take down a service. This environment trains and evaluates agents on exactly that judgment call.
