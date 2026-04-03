@@ -1,15 +1,13 @@
-
-
-
+---
 title: SQL Migration Env
-emoji: robot
 colorFrom: blue
 colorTo: green
 sdk: docker
 app_port: 7860
 pinned: false
 license: mit
-short_description: OpenEnv environment for SQL migration safety review and deployment readiness
+short_description: OpenEnv environment for evaluating SQL migration safety, rollback readiness, and production deployment risk.
+---
 
 
 # SQL Migration Review Environment
