@@ -1,0 +1,38 @@
+# Environment / secrets — never commit API keys
+.env
+.env.bat
+.env.sh
+*.env
+
+# Python bytecode
+__pycache__/
+*.py[cod]
+*.pyd
+*.pyo
+
+# Packaging
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+
+# Virtual environments
+openenv/
+venv/
+.venv/
+env/
+
+# Logs
+*.log
+inference.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db

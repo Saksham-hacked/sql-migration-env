@@ -1,0 +1,21 @@
+name: sql-migration-env
+version: "1.0.0"
+description: "SQL schema migration review environment. Agent triages migration scripts for risk, severity, and correct action."
+tags:
+  - openenv
+  - sql
+  - code-review
+  - devops
+  - real-world
+entrypoint: main:app
+port: 7860
+tasks:
+  - id: task_easy
+    description: "DROP COLUMN without rollback on 1,200-row non-production table"
+    difficulty: easy
+  - id: task_medium
+    description: "NOT NULL column without DEFAULT on 85,000-row production table"
+    difficulty: medium
+  - id: task_hard
+    description: "Blocking index build (no CONCURRENTLY) on 4.2M-row production table"
+    difficulty: hard
