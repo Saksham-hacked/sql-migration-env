@@ -12,7 +12,7 @@ for p in [ROOT, SERVER]:
     if p not in sys.path:
         sys.path.insert(0, p)
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from pydantic import BaseModel
 from typing import List, Optional
 from server.environment import SQLMigrationEnvironment
@@ -66,8 +66,15 @@ def health():
 
 
 @app.post("/reset")
-def reset(req: ResetRequest):
-    obs = _env.reset(task_id=req.task_id, episode_id=req.episode_id)
+async def reset(request: Request):
+    """Accept reset with or without a body — body is optional."""
+    try:
+        body = await request.json()
+    except Exception:
+        body = {}
+    task_id = body.get("task_id", "task_easy") if body else "task_easy"
+    episode_id = body.get("episode_id", None) if body else None
+    obs = _env.reset(task_id=task_id, episode_id=episode_id)
     return _obs_to_dict(obs, _env.state)
 
 
