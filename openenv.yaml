@@ -13,13 +13,17 @@ reset_url: /reset
 step_url: /step
 state_url: /state
 health_url: /health
+max_steps: 1
 tasks:
   - id: task_easy
     description: "DROP COLUMN without rollback on 1,200-row non-production table"
     difficulty: easy
+    max_steps: 1
   - id: task_medium
     description: "NOT NULL column without DEFAULT on 85,000-row production table"
     difficulty: medium
+    max_steps: 1
   - id: task_hard
     description: "Blocking index build (no CONCURRENTLY) on 4.2M-row production table"
     difficulty: hard
+    max_steps: 1

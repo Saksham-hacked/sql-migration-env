@@ -32,11 +32,16 @@ class SQLMigrationEnvironment:
         return self._make_obs(reward=None, message="Review this migration and submit your triage decision.")
 
     def step(self, action: MigrationAction, **kwargs) -> MigrationObservation:
+        if self._task is None:
+            # reset() was never called — auto-initialize with default task
+            self.reset(task_id="task_easy")
         if self._done:
-            return self._make_obs(reward=0.0, message="Episode already complete. Call reset().")
+            return self._make_obs(reward=0.0001, message="Episode already complete. Call reset().")  # 0.0 not allowed by validator
 
         self._state.step_count += 1
-        score = grade(self._task["id"], action)
+        raw_score = grade(self._task["id"], action)
+        # Clamp strictly to open interval (0, 1) — validator requires 0 < score < 1
+        score = max(0.0001, min(raw_score, 0.9999))
         self._state.cumulative_reward += score
         self._done = True
 
