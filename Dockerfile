@@ -1,15 +1,18 @@
-FROM python:3.11-slim
+FROM python:3.11
 
 RUN useradd -m -u 1000 user
-USER user
-ENV PATH="/home/user/.local/bin:$PATH"
 
 WORKDIR /app
 
-COPY --chown=user requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+COPY requirements.txt .
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
 
-COPY --chown=user . .
+COPY . .
+RUN chown -R user:user /app
+
+USER user
+ENV PATH="/home/user/.local/bin:$PATH"
 
 EXPOSE 7860
 
