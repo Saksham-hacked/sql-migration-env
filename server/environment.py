@@ -36,12 +36,17 @@ class SQLMigrationEnvironment:
             # reset() was never called — auto-initialize with default task
             self.reset(task_id="task_easy")
         if self._done:
-            return self._make_obs(reward=0.0001, message="Episode already complete. Call reset().")  # 0.0 not allowed by validator
+            return self._make_obs(reward=0.0001, message="Episode already complete. Call reset().")
 
         self._state.step_count += 1
         raw_score = grade(self._task["id"], action)
         # Clamp strictly to open interval (0, 1) — validator requires 0 < score < 1
         score = max(0.0001, min(raw_score, 0.9999))
+        # Never allow exact 0.0 or 1.0
+        if score <= 0.0:
+            score = 0.0001
+        if score >= 1.0:
+            score = 0.9999
         self._state.cumulative_reward += score
         self._done = True
 

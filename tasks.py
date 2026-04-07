@@ -145,9 +145,10 @@ def grade(task_id: str, action) -> float:
         jaccard = len(requested & required) / len(requested | required) if (requested | required) else 0.0
         score += w["checks"] * jaccard
 
-    # Clamp strictly to open interval (0, 1) — validator requires 0 < score < 1
+    # Round first, then clamp strictly to open interval (0, 1)
+    score = round(score, 4)
     score = max(0.0001, min(score, 0.9999))
-    return round(score, 4)
+    return score
 
 
 def _is_adjacent_recommendation(pred: str, gt: str) -> bool:

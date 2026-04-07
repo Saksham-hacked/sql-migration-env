@@ -60,6 +60,10 @@ def _obs_to_dict(obs, state=None):
     return d
 
 
+@app.get("/")
+def root():
+    return {"status": "healthy", "name": "sql-migration-env"}
+
 @app.get("/health")
 def health():
     return {"status": "healthy"}
