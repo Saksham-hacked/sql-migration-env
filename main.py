@@ -79,9 +79,27 @@ async def reset(request: Request):
     task_id = body.get("task_id", "task_easy") if body else "task_easy"
     episode_id = body.get("episode_id", None) if body else None
     obs = _env.reset(task_id=task_id, episode_id=episode_id)
-    d = _obs_to_dict(obs, _env.state)
-    d.pop("reward", None)   # reward is undefined on reset; omit entirely — null fails Phase 2 validator
-    return d
+    s = _env.state
+    # Do NOT include reward (None) or cumulative_reward (0.0) — both fail (0,1) range check
+    return {
+        "done": obs.done,
+        "observation": {
+            "task_id": obs.task_id,
+            "description": obs.description,
+            "migration_sql": obs.migration_sql,
+            "table_name": obs.table_name,
+            "table_row_count": obs.table_row_count,
+            "signals": obs.signals,
+            "step": obs.step,
+            "max_steps": obs.max_steps,
+            "message": obs.message,
+        },
+        "state": {
+            "episode_id": s.episode_id,
+            "step_count": s.step_count,
+            "task_id": s.task_id,
+        },
+    }
 
 
 @app.post("/step")
@@ -93,15 +111,37 @@ def step(req: StepRequest):
         reasoning=req.reasoning,
     )
     obs = _env.step(action)
-    return _obs_to_dict(obs, _env.state)
+    s = _env.state
+    # Only include reward at top level — validator checks it must be in (0,1)
+    # Do NOT include cumulative_reward in state block to avoid double-validation
+    return {
+        "done": obs.done,
+        "reward": obs.reward,
+        "observation": {
+            "task_id": obs.task_id,
+            "description": obs.description,
+            "migration_sql": obs.migration_sql,
+            "table_name": obs.table_name,
+            "table_row_count": obs.table_row_count,
+            "signals": obs.signals,
+            "step": obs.step,
+            "max_steps": obs.max_steps,
+            "message": obs.message,
+        },
+        "state": {
+            "episode_id": s.episode_id,
+            "step_count": s.step_count,
+            "task_id": s.task_id,
+        },
+    }
 
 
 @app.get("/state")
 def get_state():
     s = _env.state
+    # Exclude cumulative_reward — it is 0.0 before any step, which fails (0,1) range check
     return {
         "episode_id": s.episode_id,
         "step_count": s.step_count,
         "task_id": s.task_id,
-        "cumulative_reward": s.cumulative_reward,
     }
