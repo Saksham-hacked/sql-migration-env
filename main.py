@@ -76,8 +76,7 @@ async def reset(request: Request):
     episode_id = body.get("episode_id", None) if body else None
     obs = _env.reset(task_id=task_id, episode_id=episode_id)
     d = _obs_to_dict(obs, _env.state)
-    d.pop("reward", None)   # reward is undefined on reset; omit rather than send null
-    d["reward"] = None      # keep key but as null — some validators expect the key present
+    d.pop("reward", None)   # reward is undefined on reset; omit entirely — null fails Phase 2 validator
     return d
 
 
