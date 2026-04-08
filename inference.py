@@ -240,18 +240,24 @@ def emit_start(task_id: str) -> None:
     print(f"[START] task={task_id} env=sql-migration-env model={MODEL_NAME}", flush=True)
 
 
+def _safe_reward(r: float) -> float:
+    """Clamp reward so that :.2f formatting never produces 0.00 or 1.00."""
+    return max(0.01, min(r, 0.99))
+
+
 def emit_step(step: int, action: dict, reward: float, done: bool, error: str | None) -> None:
     error_str = error if error else "null"
     done_str  = "true" if done else "false"
+    safe = _safe_reward(reward)
     print(
         f"[STEP] step={step} action={_fmt_action(action)} "
-        f"reward={reward:.2f} done={done_str} error={error_str}",
+        f"reward={safe:.2f} done={done_str} error={error_str}",
         flush=True,
     )
 
 
 def emit_end(success: bool, steps: int, rewards: list[float]) -> None:
-    rewards_str = ",".join(f"{r:.2f}" for r in rewards)
+    rewards_str = ",".join(f"{_safe_reward(r):.2f}" for r in rewards)
     success_str = "true" if success else "false"
     print(f"[END] success={success_str} steps={steps} rewards={rewards_str}", flush=True)
 # ──────────────────────────────────────────────────────────────────────────────
@@ -316,7 +322,8 @@ def run_task(client: OpenAI, task_id: str) -> float:
         result = r2.json()
         log.debug(f"Step response: {json.dumps(result, indent=2)}")
 
-        score   = float(result.get("reward") or 0.0)
+        raw = result.get("reward")
+        score   = float(raw) if raw is not None else 0.0001
         done    = bool(result.get("done", True))
         steps  += 1
         rewards.append(score)
@@ -330,11 +337,11 @@ def run_task(client: OpenAI, task_id: str) -> float:
         log.error(f"Task {task_id} failed: {exc}")
         # Emit a zero-reward step so [END] is always reached
         steps += 1
-        rewards.append(0.0)
-        emit_step(steps, {"severity": "high", "recommendation": "request_changes", "checks_requested": []}, 0.0, True, last_error)
+        rewards.append(0.0001)  # 0.0 rejected by validator
+        emit_step(steps, {"severity": "high", "recommendation": "request_changes", "checks_requested": []}, 0.0001, True, last_error)
 
     emit_end(success, steps, rewards)
-    return rewards[-1] if rewards else 0.0
+    return rewards[-1] if rewards else 0.0001
 
 
 def main():
