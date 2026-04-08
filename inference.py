@@ -256,10 +256,11 @@ def emit_step(step: int, action: dict, reward: float, done: bool, error: str | N
     )
 
 
-def emit_end(success: bool, steps: int, rewards: list[float]) -> None:
+def emit_end(task_id: str, success: bool, steps: int, rewards: list[float]) -> None:
     rewards_str = ",".join(f"{_safe_reward(r):.2f}" for r in rewards)
     success_str = "true" if success else "false"
-    print(f"[END] success={success_str} steps={steps} rewards={rewards_str}", flush=True)
+    final_score = _safe_reward(rewards[-1]) if rewards else 0.01
+    print(f"[END] task={task_id} score={final_score:.2f} steps={steps} success={success_str} rewards={rewards_str}", flush=True)
 # ──────────────────────────────────────────────────────────────────────────────
 
 
@@ -323,7 +324,7 @@ def run_task(client: OpenAI, task_id: str) -> float:
         log.debug(f"Step response: {json.dumps(result, indent=2)}")
 
         raw = result.get("reward")
-        score   = float(raw) if raw is not None else 0.0001
+        score   = _safe_reward(float(raw)) if raw is not None else 0.0001
         done    = bool(result.get("done", True))
         steps  += 1
         rewards.append(score)
@@ -340,7 +341,7 @@ def run_task(client: OpenAI, task_id: str) -> float:
         rewards.append(0.0001)  # 0.0 rejected by validator
         emit_step(steps, {"severity": "high", "recommendation": "request_changes", "checks_requested": []}, 0.0001, True, last_error)
 
-    emit_end(success, steps, rewards)
+    emit_end(task_id, success, steps, rewards)
     return rewards[-1] if rewards else 0.0001
 
 
